@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZynoxHunter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .title:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(45deg, #00d4ff, #ff00ff);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        }
+
+        .dashboard-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dashboard-btn {
+            padding: 20px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+            text-align: center;
+        }
+
+        .dashboard-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.3);
+        }
+
+        .content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .data-display {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-item:last-child {
+            border-bottom: none;
+        }
+
+        .admin-panel {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .admin-panel.active {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .admin-tab-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-tab-btn.active {
+            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .ticket, .user-card {
+            background: rgba(0, 255, 136, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00ff88;
+        }
+
+        .ticket.claimed {
+            background: rgba(255, 107, 107, 0.1);
+            border-left-color: #ff6b6b;
+        }
+
+        .user-card {
+            border-left-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.15);
+        }
+
+        .game-links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .game-link {
+            padding: 15px 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .game-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-new { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .status-veteran { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .status-active { background: rgba(0, 212, 255, 0.2); color: #00d4ff; }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .tab-buttons, .admin-tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Halaman 1: Login & Daftar -->
+        <div id="page1" class="content active">
+            <h1 class="title" id="mainTitle" onclick="checkAdminClick()">ZynoxHunter</h1>
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab('register')">Daftar</button>
+                <button class="tab-btn" onclick="showTab('login')">Login</button>
+            </div>
+
+            <!-- Form Daftar -->
+            <div id="registerTab">
+                <form onsubmit="register(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="regUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Lahir</label>
+                        <input type="date" id="regBirthdate" required>
+                    </div>
+                    <button type="submit" class="btn">Buat Akun</button>
+                </form>
+            </div>
+
+            <!-- Form Login -->
+            <div id="loginTab" style="display: none;">
+                <form onsubmit="login(event)">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-secondary">Masuk</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Halaman 2: Dashboard -->
+        <div id="page2" class="content">
+            <h1 class="title" id="dashboardTitle" onclick="checkAdminClick()">ZynoxHunter Dashboard</h1>
+            <div class="dashboard-btns">
+                <div class="dashboard-btn" onclick="showAccountData()">
+                    <span>👤 Data Akun</span>
+                </div>
+                <div class="dashboard-btn" onclick="showAppealForm()">
+                    <span>⚖️ Aju Banding</span>
+                </div>
+                <div class="dashboard-btn" onclick="showGame()">
+                    <span>🎮 Game Hamka</span>
+                </div>
+            </div>
+
+            <!-- Data Akun -->
+            <div id="accountData" class="data-display" style="display: none;"></div>
+
+            <!-- Form Banding -->
+            <div id="appealForm" style="display: none;">
+                <h3 style="margin-bottom: 20px; text-align: center;">Form Pengajuan Banding</h3>
+                <form onsubmit="submitAppeal(event)">
+                    <div class="form-group">
+                        <label>Nama Lengkap</label>
+                        <input type="text" id="appealName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas</label>
+                        <input type="text" id="appealClass" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alasan Di-Ban</label>
+                        <textarea id="appealReasonBan" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Alasan Membuka Ban</label>
+                        <textarea id="appealReasonUnban" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Apakah anda berjanji untuk tidak mengulangi?</label>
+                        <select id="appealPromise" required>
+                            <option value="">Pilih...</option>
+                            <option value="Ya">Ya</option>
+                            <option value="Tidak">Tidak</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Kirim Banding</button>
+                </form>
+            </div>
+
+            <!-- Game Hamka -->
+            <div id="gameSection" style="display: none;">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #ff6b6b; font-size: 2rem;">Game Hamkaa!! 🚀</h2>
+                <div class="game-links">
+                    <a href="https://hamka223455-svg.github.io/Trading-hamka/" target="_blank" class="game-link">
+                        💰 LINK INVESTASI SPACEMAN
+                    </a>
+                    <a href="https://hamka223455-svg.github.io/Game-taruhan-hamka/" target="_blank" class="game-link">
+                        ⚽ LINK STRATEGI REGU BOLA
+                    </a>
+                    <a href="https://hamka223455-svg.github.io/Slot-Hamka22/" target="_blank" class="game-link">
+                        🎰 LINK SLOT FAKE DEMO
+                    </a>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="admin-panel">
+                <h3 style="text-align: center; color: #00ff88;">🔧 Admin Panel</h3>
+                <div class="admin-tabs">
+                    <button class="admin-tab-btn active" onclick="showAdminTab('tickets')">Tiket Banding</button>
+                    <button class="admin-tab-btn" onclick="showAdminTab('users')">Data Member</button>
+                </div>
+                
+                <!-- Tiket Banding -->
+                <div id="ticketsSection" class="admin-section active">
+                    <div id="ticketsList"></div>
+                </div>
+                
+                <!-- Data Member -->
+                <div id="usersSection" class="admin-section">
+                    <div id="usersList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let adminClicks = 0;
+        let isAdmin = false;
+        let activeAdminTab = 'tickets';
+
+        // Tab switching untuk login/daftar
+        function showTab(tab) {
+            document.querySelectorAll('#page1 .tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('registerTab').style.display = tab === 'register' ? 'block' : 'none';
+            document.getElementById('loginTab').style.display = tab === 'login' ? 'block' : 'none';
+        }
+
+        // Register
+        function register(event) {
+            event.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const birthdate = document.getElementById('regBirthdate').value;
+            const createdAt = new Date().toISOString();
+
+            const userData = {
+                username,
+                password,
+                birthdate,
+                createdAt,
+                appeals: []
+            };
+
+            localStorage.setItem(`zynox_${username}`, JSON.stringify(userData));
+            alert('Akun berhasil dibuat!');
+            currentUser = username;
+            showDashboard();
+        }
+
+        // Login
+        function login(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const userData = localStorage.getItem(`zynox_${username}`);
+
+            if (userData) {
+                const parsed = JSON.parse(userData);
+                if (parsed.password === password) {
+                    currentUser = username;
+                    alert('Login berhasil!');
+                    showDashboard();
+                } else {
+                    alert('Password salah!');
+                }
+            } else {
+                alert('Akun tidak ditemukan!');
+            }
+        }
+
+        // Show Dashboard
+        function showDashboard() {
+            localStorage.setItem('lastUser', currentUser);
+            document.getElementById('page1').classList.remove('active');
+            document.getElementById('page2').classList.add('active');
+        }
+
+        // Show Account Data
+        function showAccountData() {
+            hideAllSections();
+            const userData = JSON.parse(localStorage.getItem(`zynox_${currentUser}`));
+            const daysOld = Math.floor((new Date() - new Date(userData.createdAt)) / (1000 * 60 * 60 * 24));
+            
+            let status = 'Member Baru';
+            if (daysOld > 30) status = 'Member Lama';
+            else if (daysOld > 7) status = 'Member Aktif';
+
+            document.getElementById('accountData').innerHTML = `
+                <div class="data-item">
+                    <span>Username:</span>
+                    <strong>${userData.username}</strong>
+                </div>
+                <div class="data-item">
+                    <span>Password:</span>
+                    <strong>${userData.password}</strong>
+                </div>
+                <div class="data-item">
+                    <span>Tanggal Lahir:</span>
+                    <strong>${new Date(userData.birthdate).toLocaleDateString('id-ID')}</strong>
+                </div>
+                <div class="data-item">
+                    <span>Status Akun:</span>
+                    <span class="status-badge status-${status.toLowerCase().replace(' ', '-')}">${status}</span>
+                </div>
+                <div class="data-item">
+                    <span>Umur Akun:</span>
+                    <strong>${daysOld} hari</strong>
+                </div>
+            `;
+            document.getElementById('accountData').style.display = 'block';
+        }
+
+        // Show Appeal Form
+        function showAppealForm() {
+            hideAllSections();
+            document.getElementById('appealForm').style.display = 'block';
+        }
+
+        // Submit Appeal
+        function submitAppeal(event) {
+            event.preventDefault();
+            const appeal = {
+                id: Date.now(),
+                name: document.getElementById('appealName').value,
+                kelas: document.getElementById('appealClass').value,
+                reasonBan: document.getElementById('appealReasonBan').value,
+                reasonUnban: document.getElementById('appealReasonUnban').value,
+                promise: document.getElementById('appealPromise').value,
+                username: currentUser,
+                date: new Date().toISOString(),
+                status: 'pending'
+            };
+
+            let appeals = JSON.parse(localStorage.getItem('appeals') || '[]');
+            appeals.push(appeal);
+            localStorage.setItem('appeals', JSON.stringify(appeals));
+
+            // Tambah ke user data
+            const userData = JSON.parse(localStorage.getItem(`zynox_${currentUser}`));
+            userData.appeals = userData.appeals || [];
+            userData.appeals.push(appeal.id);
+            localStorage.setItem(`zynox_${currentUser}`, JSON.stringify(userData));
+
+            alert('Tiket banding berhasil dikirim!');
+            document.getElementById('appealForm').style.display = 'none';
+        }
+
+        // Show Game
+        function showGame() {
+            hideAllSections();
+            document.getElementById('gameSection').style.display = 'block';
+        }
+
+        // Admin Click Detection
+        function checkAdminClick() {
+            adminClicks++;
+            if (adminClicks >= 5) {
+                isAdmin = true;
+                adminClicks = 0;
+                document.getElementById('adminPanel').classList.add('active');
+                showAdminTab(activeAdminTab);
+                alert('🔧 Admin mode aktif! Semua fitur admin tersedia');
+            }
+        }
+
+        // Admin Tab Switching
+        function showAdminTab(tab) {
+            activeAdminTab = tab;
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.admin-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(tab + 'Section').classList.add('active');
+            
+            if (tab === 'tickets') loadTickets();
+            else loadUsers();
+        }
+
+        // Load Tickets for Admin
+        function loadTickets() {
+            const appeals = JSON.parse(localStorage.getItem('appeals') || '[]');
+            let html = '';
+            appeals.forEach(ticket => {
+                const claimed = ticket.status === 'claimed';
+                html += `
+                    <div class="ticket ${claimed ? 'claimed' : ''}" data-id="${ticket.id}">
+                        <div><strong>${ticket.name}</strong> - ${ticket.kelas}</div>
+                        <div><small>${ticket.username} - ${new Date(ticket.date).toLocaleString('id-ID')}</small></div>
+                        <div style="margin: 10px 0;"><strong>Alasan Ban:</strong> ${ticket.reasonBan}</div>
+                        <div style="margin: 10px 0;"><strong>Alasan Unban:</strong> ${ticket.reasonUnban}</div>
+                        <div><strong>Janji:</strong> ${ticket.promise}</div>
+                        <div style="margin-top: 15px;">
+                            <span class="status-badge ${claimed ? 'status-new' : ''}">${claimed ? 'Sudah di-claim' : 'Pending'}</span>
+                            ${!claimed ? `<button class="btn" onclick="claimTicket(${ticket.id})" style="width: auto; padding: 8px 16px; font-size: 0.9rem; margin-top: 10px;">Claim</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('ticketsList').innerHTML = html || '<p style="text-align: center; color: #ccc;">Tidak ada tiket banding</p>';
+        }
+
+        // Load Users for Admin
+        function loadUsers() {
+            let html = '';
+            let totalUsers = 0;
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('zynox_')) {
+                    totalUsers++;
+                    const userData = JSON.parse(localStorage.getItem(key));
+                    const daysOld = Math.floor((new Date() - new Date(userData.createdAt)) / (1000 * 60 * 60 * 24));
+                    let status = 'Member Baru';
+                    if (daysOld > 30) status = 'Member Lama';
+                    else if (daysOld > 7) status = 'Member Aktif';
+                    
+                    html += `
+                        <div class="user-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <strong style="font-size: 1.2rem;">${userData.username}</strong>
+                                <span class="status-badge status-${status.toLowerCase().replace(' ', '-')}">${status}</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem;">
+                                <div><strong>Password:</strong> ${userData.password}</div>
+                                <div><strong>Umur Akun:</strong> ${daysOld} hari</div>
+                                <div><strong>Lahir:</strong> ${new Date(userData.birthdate).toLocaleDateString('id-ID')}</div>
+                                <div><strong>Dibuat:</strong> ${new Date(userData.createdAt).toLocaleDateString('id-ID')}</div>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <strong>Ticket Banding:</strong> ${userData.appeals ? userData.appeals.length : 0}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            document.getElementById('usersList').innerHTML = 
+                totalUsers > 0 
+                ? html 
+                : '<p style="text-align: center; color: #ccc;">Belum ada member</p>';
+        }
+
+        // Claim Ticket
+        function claimTicket(id) {
+            let appeals = JSON.parse(localStorage.getItem('appeals') || '[]');
+            appeals = appeals.map(ticket => 
+                ticket.id === id ? { ...ticket, status: 'claimed' } : ticket
+            );
+            localStorage.setItem('appeals', JSON.stringify(appeals));
+            loadTickets();
+        }
+
+        // Hide all sections
+        function hideAllSections() {
+            document.getElementById('accountData').style.display = 'none';
+            document.getElementById('appealForm').style.display = 'none';
+            document.getElementById('gameSection').style.display = 'none';
+        }
+
+        // Auto login if already logged in
+        window.onload = function() {
+            const lastUser = localStorage.getItem('lastUser');
+            if (lastUser) {
+                const userData = localStorage.getItem(`zynox_${lastUser}`);
+                if (userData) {
+                    currentUser = lastUser;
+                    showDashboard();
+                }
+            }
+        };
+    </script>
+</body>
+</html>
